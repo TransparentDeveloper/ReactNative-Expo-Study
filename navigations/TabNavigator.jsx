@@ -14,6 +14,7 @@ const TabNavigator = ({ navigation, route }) => {
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false,
         tabBarIcon: ({ focused }) => {
           //현재 이 앱을 구동하고 있는 디바이스가 뭔지 Platform.OS 을 통해 확인 할 수 있음
           let iconName = Platform.OS === "ios" ? "ios-" : "md-";
