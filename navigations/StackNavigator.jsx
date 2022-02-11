@@ -5,10 +5,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 //페이지로 만든 컴포넌트들을 불러옵니다
 import SignInPage from "../pages/SignInPage";
 import SignUpPage from "../pages/SignUpPage";
-import MainPage from "../pages/MainPage";
 import DetailPage from "../pages/DetailPage";
-import AddPage from "../pages/AddPage";
-import MyPage from "../pages/MyPage";
+
+import TabNavigator from "./TabNavigator";
 
 //스택 네비게이션 라이브러리가 제공해주는 여러 기능이 담겨있는 객체를 사용합니다
 //그래서 이렇게 항상 상단에 선언하고 시작하는게 규칙입니다!
@@ -26,12 +25,11 @@ const StackNavigator = () => {
       }}
     >
       {/* 컴포넌트를 페이지로 만들어주는 엘리먼트에 끼워 넣습니다. 이 자체로 이제 페이지 기능을 합니다*/}
+
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="SignInPage" component={SignInPage} />
       <Stack.Screen name="SignUpPage" component={SignUpPage} />
-      <Stack.Screen name="MainPage" component={MainPage} />
       <Stack.Screen name="DetailPage" component={DetailPage} />
-      <Stack.Screen name="AddPage" component={AddPage} />
-      <Stack.Screen name="MyPage" component={MyPage} />
     </Stack.Navigator>
   );
 };
