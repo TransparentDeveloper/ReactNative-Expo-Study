@@ -26,8 +26,8 @@ const StackNavigator = () => {
     >
       {/* 컴포넌트를 페이지로 만들어주는 엘리먼트에 끼워 넣습니다. 이 자체로 이제 페이지 기능을 합니다*/}
 
-      <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="SignInPage" component={SignInPage} />
+      <Stack.Screen name="TabNavigator" component={TabNavigator} />
       <Stack.Screen name="SignUpPage" component={SignUpPage} />
       <Stack.Screen name="DetailPage" component={DetailPage} />
     </Stack.Navigator>
