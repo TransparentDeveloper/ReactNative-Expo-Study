@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, ImageBackground } from "react-native";
 import {
   Container,
@@ -19,6 +19,55 @@ const bImage = require("../assets/background.png");
 import ItemInput from "../components/ItemInput";
 
 export default function SignUpPage({ navigation }) {
+  const [nickName, setNickName] = useState("");
+  const [nickNameError, setNickNameError] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordConfirmError, setPasswordConfirmError] = useState("");
+
+  const doSignUp = () => {
+    if (nickName == "") {
+      setNickNameError("닉네임을 입력해주세요");
+      return false;
+    } else {
+      setNickNameError("");
+    }
+
+    if (email == "") {
+      setEmailError("이메일을 입력해주세요");
+      return false;
+    } else {
+      setEmailError("");
+    }
+
+    if (password == "") {
+      setPasswordError("비밀번호를 입력해주세요");
+      return false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (passwordConfirm == "") {
+      setPasswordConfirmError("비밀번호 확인을 입력해주세요");
+      return false;
+    } else {
+      setPasswordConfirmError("");
+    }
+
+    if (password !== passwordConfirm) {
+      setPasswordConfirmError("비밀번호가 서로 일치 하지 않습니다.");
+      return false;
+    } else {
+      setPasswordConfirmError("");
+    }
+  };
+
   return (
     <Container style={styles.container}>
       <ImageBackground source={bImage} style={styles.backgroundImage}>
@@ -41,12 +90,32 @@ export default function SignUpPage({ navigation }) {
             <Text style={styles.highlite}>we</Text>gram signup
           </Text>
           <Form style={styles.form}>
-            <ItemInput title={"닉네임"} />
-            <ItemInput title={"이메일"} />
-            <ItemInput title={"비밀번호"} />
-            <ItemInput title={"비밀번호 확인"} />
+            <ItemInput
+              title={"닉네임"}
+              type={"nickName"}
+              error={nickNameError}
+              setFunc={setNickName}
+            />
+            <ItemInput
+              title={"이메일"}
+              type={"email"}
+              error={emailError}
+              setFunc={setEmail}
+            />
+            <ItemInput
+              title={"비밀번호"}
+              type={"password"}
+              error={passwordError}
+              setFunc={setPassword}
+            />
+            <ItemInput
+              title={"비밀번호 확인"}
+              type={"passwordConfirm"}
+              error={passwordConfirmError}
+              setFunc={setPasswordConfirm}
+            />
           </Form>
-          <Button full style={styles.emailSignUp}>
+          <Button full style={styles.emailSignUp} onPress={doSignUp}>
             <Text>등록</Text>
           </Button>
         </Content>
