@@ -1,112 +1,64 @@
-import { Container, Content } from "native-base";
 import React from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet } from "react-native";
 import { Col, Grid } from "react-native-easy-grid";
-import HeaderComponent from "../components/HeaderComponent";
+import { Container, Content, Text, Thumbnail } from "native-base";
 import ImageComponent from "../components/ImageComponent";
+import HeaderComponent from "../components/HeaderComponent";
+import { TouchableOpacity } from "react-native-gesture-handler";
 const my = require("../assets/my.png");
-
 const data = require("../data.json");
 
-export default function MyPage({ navigation }) {
+export default function MyPage() {
   return (
     <Container>
       <HeaderComponent />
       <Content>
-        <View style={styles.profile}>
-          <Image source={my} style={styles.profileImage} />
-          <Text style={[styles.name, styles.textBold, styles.textAlignCenter]}>
-            스파르타코딩 클럽
-          </Text>
-          <Text style={styles.textAlignCenter}>gunhee@spartacoding.co.kr</Text>
-        </View>
-
-        <Grid style={{ justifyContent: "center" }}>
-          <Col size={2} style={{ padding: 15 }}>
-            <Text
-              style={[styles.activity, styles.textBold, styles.textAlignCenter]}
-            >
-              작성한 글
-            </Text>
-            <Text
-              style={[styles.number, styles.textBold, styles.textAlignCenter]}
-            >
-              7
-            </Text>
+        <Thumbnail large source={my} style={styles.thumbnail} />
+        <Text style={styles.myTitle}>스파르타코딩 클럽</Text>
+        <Text style={{ alignSelf: "center" }}>gunhee@spartacoding.co.kr</Text>
+        <TouchableOpacity style={{ marginTop: 20 }}>
+          <Text style={styles.logout}>로그아웃</Text>
+        </TouchableOpacity>
+        <Grid style={{ marginTop: 30 }}>
+          <Col size={3} style={{ alignItems: "center" }}>
+            <Text style={styles.category}>작성한 글</Text>
+            <Text style={styles.categoryContent}>7</Text>
           </Col>
-          <Col size={2} style={{ padding: 15 }}>
-            <Text
-              style={[styles.activity, styles.textBold, styles.textAlignCenter]}
-            >
-              작성한 댓글
-            </Text>
-            <Text
-              style={[styles.number, styles.textBold, styles.textAlignCenter]}
-            >
-              21
-            </Text>
+          <Col size={3} style={{ alignItems: "center" }}>
+            <Text style={styles.category}>작성한 댓글</Text>
+            <Text style={styles.categoryContent}>21</Text>
           </Col>
-          <Col size={2} style={{ padding: 15 }}>
-            <Text
-              style={[styles.activity, styles.textBold, styles.textAlignCenter]}
-            >
-              방문횟수
-            </Text>
-            <Text
-              style={[styles.number, styles.textBold, styles.textAlignCenter]}
-            >
-              321
-            </Text>
+          <Col size={3} style={{ alignItems: "center" }}>
+            <Text style={styles.category}>방문 횟수</Text>
+            <Text style={styles.categoryContent}>321</Text>
           </Col>
         </Grid>
-
-        <View style={styles.imageList}>
+        <Grid style={styles.imageWrap}>
           {data.diary.map((content, i) => {
-            return (
-              <ImageComponent
-                content={content}
-                key={i}
-                navigation={navigation}
-              />
-            );
+            return <ImageComponent image={content.image} key={i} />;
           })}
-        </View>
+        </Grid>
       </Content>
     </Container>
   );
 }
 
 const styles = StyleSheet.create({
-  profile: {
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  name: {
-    fontSize: 20,
+  thumbnail: { alignSelf: "center", marginTop: 30 },
+  myTitle: {
+    alignSelf: "center",
     marginTop: 10,
+    fontSize: 20,
+    fontWeight: "700",
   },
-  activity: {
-    fontSize: 18,
-  },
-  number: {
-    fontSize: 18,
-    color: "hotpink",
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 100,
-  },
-  imageList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  textBold: {
-    fontWeight: "bold",
-  },
-  textAlignCenter: {
-    textAlign: "center",
+  category: { fontWeight: "700" },
+  categoryContent: { color: "deeppink", fontWeight: "700" },
+  imageWrap: { flexWrap: "wrap", marginTop: 20 },
+  logout: {
+    alignSelf: "center",
+    padding: 10,
+    borderColor: "grey",
+    borderWidth: 1,
+    borderRadius: 10,
   },
 });

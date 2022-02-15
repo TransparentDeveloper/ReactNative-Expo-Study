@@ -9,7 +9,7 @@ export default function CardComponent({ navigation, content }) {
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("DetailPage");
+        navigation.navigate("DetailPage", { content: content });
       }}
       style={styles.container}
     >
