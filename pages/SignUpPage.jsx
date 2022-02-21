@@ -17,6 +17,7 @@ import {
 } from "native-base";
 const bImage = require("../assets/background.png");
 import ItemInput from "../components/ItemInput";
+import { registration } from "../config/firebaseFunctions";
 
 export default function SignUpPage({ navigation }) {
   const [nickName, setNickName] = useState("");
@@ -66,6 +67,8 @@ export default function SignUpPage({ navigation }) {
     } else {
       setPasswordConfirmError("");
     }
+    console.log("됨?");
+    registration(nickName, email, password);
   };
 
   return (
@@ -110,7 +113,7 @@ export default function SignUpPage({ navigation }) {
             />
             <ItemInput
               title={"비밀번호 확인"}
-              type={"passwordConfirm"}
+              type={"password"}
               error={passwordConfirmError}
               setFunc={setPasswordConfirm}
             />

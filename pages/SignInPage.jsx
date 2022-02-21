@@ -1,36 +1,40 @@
-import React, { useState } from "react";
-import { StyleSheet, ImageBackground } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, ImageBackground, Alert } from "react-native";
 import { Container, Content, Text, Form, Button } from "native-base";
 const bImage = require("../assets/background.png");
 import ItemInput from "../components/ItemInput";
+import { signIn } from "../config/firebaseFunctions";
 
-export default function SignInPage({ navigation }) {
+export default function SignInPage({ navigation, authState }) {
+  useEffect(() => {
+    navigation.addListener("beforeRemove", (e) => {
+      e.preventDefault();
+    });
+  });
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
-  const goSignUp = () => {
-    navigation.navigate("SignUpPage");
-  };
-
   const doSignIn = () => {
     //Email 로그인 버튼을 누를 때 실행되는 함수
-    //관리하는 상태 값을 확인
-    console.log(email);
-    console.log(password);
     if (email == "") {
       setEmailError("이메일을 입력해주세요");
+      return false;
     } else {
       setEmailError("");
     }
 
     if (password == "") {
       setPasswordError("비밀번호를 입력해주세요");
+      return false;
     } else {
       setPasswordError("");
     }
+    console.log("이거됨?");
+    signIn(email, password, navigation);
   };
   const setEmailFunc = (itemInputEmail) => {
     //이메일 상태값을 관리하는 함수
@@ -39,6 +43,10 @@ export default function SignInPage({ navigation }) {
   const setPasswordFunc = (itemInputPassword) => {
     //패스워드 상태값을 관리하는 함수
     setPassword(itemInputPassword);
+  };
+
+  const goSignUp = () => {
+    navigation.navigate("SignUpPage");
   };
 
   return (

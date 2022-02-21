@@ -9,8 +9,19 @@ import { Ionicons } from "@expo/vector-icons";
 
 import Loading from "./pages/Loading";
 
+//파이어베이스 라이브러리 불어오기!
+import firebase from "firebase/compat/app";
+//파이어베이스 접속 키값 가져오기
+import apiKeys from "./config/key";
+
 export default function App() {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
+
+  //파이어베이스 라이브러리가 준비 되면 연결하는 조건문!
+  if (!firebase.apps.length) {
+    console.log("Connected with Firebase");
+    firebase.initializeApp(apiKeys.firebaseConfig);
+  }
 
   const loadFont = () => {
     setTimeout(async () => {
@@ -19,7 +30,7 @@ export default function App() {
         Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
         ...Ionicons.font,
       });
-      await setReady(true);
+      setReady(true);
     }, 1000);
   };
 
