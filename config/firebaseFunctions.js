@@ -22,12 +22,23 @@ export async function registration(nickName, email, password) {
 }
 
 export async function signIn(email, password, navigation) {
-  console.log("이거됨?");
   try {
     await auth.signInWithEmailAndPassword(email, password);
     navigation.push("TabNavigator");
   } catch (err) {
     Alert.alert("로그인에 문제가 있습니다! ", err.message);
     Alert.alert("로그인에 문제가 있습니다! ", err.message);
+  }
+}
+
+export async function logout(navigation) {
+  try {
+    console.log("로그아웃!!");
+    const currentUser = auth.currentUser;
+    console.log(currentUser);
+    await auth.signOut();
+    navigation.push("SignInPage");
+  } catch (err) {
+    Alert.alert("로그 아웃에 문제가 있습니다! ", err.message);
   }
 }
