@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
+import "firebase/compat/storage";
 import { Alert, AsyncStorage } from "react-native";
 
 export async function registration(nickName, email, password, navigation) {
@@ -56,4 +57,19 @@ export async function addDiary(content) {
     Alert.alert("글 작성에 문제가 있습니다! ", err.message);
     return false;
   }
+}
+
+export async function imageUpload(blob, date) {
+  console.log("설마 여기까지 오다니?", date);
+  const storageRef = firebase
+    .storage()
+    .ref()
+    .child("diary/" + date);
+  const snapshot = await storageRef.put(blob);
+  console.log("이건?");
+  const imageUrl = await snapshot.ref.getDownloadURL();
+  console.log("끝");
+  blob.close();
+
+  return imageUrl;
 }

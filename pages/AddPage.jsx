@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Image, View, Dimensions } from "react-native";
+import { StyleSheet, Image, View, Dimensions, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import {
@@ -27,7 +27,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 
-import { addDiary } from "../config/firebaseFunctions";
+import { addDiary, imageUpload } from "../config/firebaseFunctions";
 
 const tempImage =
   "https://firebasestorage.googleapis.com/v0/b/sparta-study-plus.appspot.com/o/lecture%2F6-min.png?alt=media&token=bbc87679-4084-40ad-b6cd-01e808983fa4";
@@ -40,6 +40,7 @@ export default function AddPage() {
   const [contentError, setContentError] = useState("");
 
   const [image, setImage] = useState(tempImage);
+  const [imageUri, setImageUri] = useState("");
 
   useEffect(() => {
     getPermission();
@@ -59,18 +60,28 @@ export default function AddPage() {
     console.log("업로드 준비중!");
     const currentUser = firebase.auth().currentUser;
     let date = new Date();
+    let getTime = date.getTime();
     let data = {
       title: title,
       author: currentUser.email,
       desc: content,
       image: image,
-      date: date.getTime(),
+      date: getTime,
       uid: currentUser.uid,
     };
-
+    const response = await fetch(imageUri);
+    const blob = await response.blob();
+    console.log("여기까지 옴");
+    const imageUrl = await imageUpload(blob, getTime);
+    data.image = imageUrl;
+    console.log(data);
     let result = addDiary(data);
     if (result) {
-      Alert("글이 성공적으로 등록되었습니다!");
+      Alert.alert("글이 성공적으로 등록되었습니다!");
+      setTitle("");
+      setContent("");
+      setImage(tempImage);
+      setImageUri("");
     }
   };
 
@@ -87,8 +98,7 @@ export default function AddPage() {
   };
 
   const getImageUrl = async (imageData) => {
-    const response = await fetch(imageData.uri);
-    const blob = await response.blob();
+    setImageUri(imageData.uri);
   };
 
   return (
@@ -99,9 +109,19 @@ export default function AddPage() {
           source={background2}
           style={{ width: "95%", height: 100, borderRadius: 10 }}
         />
-        <Grid style={styles.imageUpload} onPress={() => pickImage()}>
-          <Text style={styles.imageUploadPlus}>+</Text>
-        </Grid>
+
+        {imageUri == "" ? (
+          <Grid style={styles.imageUpload} onPress={() => pickImage()}>
+            <Text style={styles.imageUploadPlus}>+</Text>
+          </Grid>
+        ) : (
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.imagePreview}
+            onPress={() => pickImage()}
+          />
+        )}
+
         <Item regular style={styles.title}>
           <Input
             placeholder="다이어리 제목을 입력해주세요!"
@@ -132,6 +152,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "grey",
     borderStyle: "dashed",
+    width: "90%",
+    height: 200,
+    marginTop: 20,
+    alignSelf: "center",
+    alignItems: "center",
+  },
+  imagePreview: {
+    borderRadius: 10,
     width: "90%",
     height: 200,
     marginTop: 20,
