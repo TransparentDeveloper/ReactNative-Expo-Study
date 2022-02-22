@@ -20,8 +20,6 @@ export default function SignInPage({ navigation }) {
       e.preventDefault();
     });
 
-    console.log("?");
-
     setTimeout(() => {
       AsyncStorage.getItem("session", (err, result) => {
         console.log("ASYNCSTORAGE");

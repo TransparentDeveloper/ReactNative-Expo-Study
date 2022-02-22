@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/auth";
 import { Alert, AsyncStorage } from "react-native";
 
 export async function registration(nickName, email, password, navigation) {
@@ -40,5 +40,20 @@ export async function logout(navigation) {
     navigation.push("SignInPage");
   } catch (err) {
     Alert.alert("로그 아웃에 문제가 있습니다! ", err.message);
+  }
+}
+
+export async function addDiary(content) {
+  try {
+    console.log("왔니?", content);
+    const db = firebase.firestore();
+    await db
+      .collection("diary")
+      .doc(content.date + "D")
+      .set(content);
+    return true;
+  } catch (err) {
+    Alert.alert("글 작성에 문제가 있습니다! ", err.message);
+    return false;
   }
 }
