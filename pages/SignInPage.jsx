@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ImageBackground, Alert } from "react-native";
+import { StyleSheet, ImageBackground, Alert, AsyncStorage } from "react-native";
 import { Container, Content, Text, Form, Button } from "native-base";
 const bImage = require("../assets/background.png");
 import ItemInput from "../components/ItemInput";
 import { signIn } from "../config/firebaseFunctions";
+import firebase from "firebase/compat/app";
 import Loading from "../pages/Loading";
 export default function SignInPage({ navigation }) {
   const [ready, setReady] = useState(false);
@@ -19,7 +20,18 @@ export default function SignInPage({ navigation }) {
       e.preventDefault();
     });
 
+    console.log("?");
+
     setTimeout(() => {
+      AsyncStorage.getItem("session", (err, result) => {
+        console.log("ASYNCSTORAGE");
+        console.log(result);
+        if (result) {
+          navigation.push("TabNavigator");
+        } else {
+          setReady(true);
+        }
+      });
       setReady(true);
     }, 1000);
   }, []);
