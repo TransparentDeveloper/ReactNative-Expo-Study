@@ -18,10 +18,9 @@ import {
   Textarea,
 } from "native-base";
 import HeaderComponent from "../components/HeaderComponent";
-import style from "react-native-image-blur-loading/src/style";
+
 const background2 = require("../assets/background2.png");
-const data = require("../data.json");
-const imageWidth = Dimensions.get("window").width / 3;
+const loading = require("../assets/loading.gif");
 
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -42,6 +41,8 @@ export default function AddPage() {
   const [image, setImage] = useState(tempImage);
   const [imageUri, setImageUri] = useState("");
 
+  const [progress, setProgress] = useState(false);
+
   useEffect(() => {
     getPermission();
   }, []);
@@ -58,6 +59,7 @@ export default function AddPage() {
 
   const upload = async () => {
     console.log("업로드 준비중!");
+    setProgress(true);
     const currentUser = firebase.auth().currentUser;
     let date = new Date();
     let getTime = date.getTime();
@@ -71,17 +73,18 @@ export default function AddPage() {
     };
     const response = await fetch(imageUri);
     const blob = await response.blob();
-    console.log("여기까지 옴");
     const imageUrl = await imageUpload(blob, getTime);
     data.image = imageUrl;
-    console.log(data);
-    let result = addDiary(data);
+    let result = await addDiary(data);
     if (result) {
       Alert.alert("글이 성공적으로 등록되었습니다!");
       setTitle("");
       setContent("");
       setImage(tempImage);
       setImageUri("");
+      setProgress(false);
+    } else {
+      setProgress(false);
     }
   };
 
@@ -103,6 +106,9 @@ export default function AddPage() {
 
   return (
     <Container>
+      {progress == false ? null : (
+        <Image source={loading} style={styles.progress} />
+      )}
       <HeaderComponent />
       <Content>
         <Image
@@ -126,6 +132,7 @@ export default function AddPage() {
           <Input
             placeholder="다이어리 제목을 입력해주세요!"
             style={{ fontSize: 13 }}
+            value={title}
             onChangeText={(text) => setTitle(text)}
           />
         </Item>
@@ -135,6 +142,7 @@ export default function AddPage() {
             bordered
             placeholder="내용을 입력해주세요"
             style={styles.content}
+            value={content}
             onChangeText={(text) => setContent(text)}
           />
         </Form>
@@ -190,5 +198,14 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 10,
     backgroundColor: "pink",
+  },
+  progress: {
+    width: 100,
+    height: 100,
+    borderRadius: 100,
+    position: "absolute",
+    top: "50%",
+    alignSelf: "center",
+    zIndex: 2,
   },
 });
