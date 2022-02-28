@@ -14,16 +14,23 @@ import {
 import CardComponent from "../components/CardComponent";
 import HeaderComponent from "../components/HeaderComponent";
 import * as Animatable from "react-native-animatable";
-
+import { getData } from "../config/firebaseFunctions";
 const data = require("../data.json");
 export default function MainPage({ navigation }) {
-  //뒤로 가기 막아버리기 (로그인 후 MainPage 진입후에는 다시 SignInPage로 가는 것을 막는다.)
+  const [data, setData] = useState([]);
+
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
       e.preventDefault();
     });
-  });
+    readyData();
+  }, []);
+  const readyData = async () => {
+    const data = await getData();
+    setData(data);
+  };
 
+  console.log(data);
   return (
     <Container>
       <HeaderComponent />
@@ -49,7 +56,7 @@ export default function MainPage({ navigation }) {
           <Text style={{ color: "grey" }}>FROM THE DIARY</Text>
         </Grid>
         <View style={{ marginTop: -20 }}>
-          {data.diary.map((content, i) => {
+          {data.map((content, i) => {
             return (
               <CardComponent
                 content={content}

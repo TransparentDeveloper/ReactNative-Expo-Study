@@ -18,7 +18,6 @@ import {
   Button,
   Thumbnail,
 } from "native-base";
-import CardComponent from "../components/CardComponent";
 import ImageComponent from "../components/ImageComponent";
 import HeaderComponent from "../components/HeaderComponent";
 import { TouchableOpacity } from "react-native-gesture-handler";
