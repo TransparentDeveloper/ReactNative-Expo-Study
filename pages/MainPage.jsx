@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Image, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Image,
+  View,
+  FlatList,
+  SafeAreaView,
+  Alert,
+} from "react-native";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import {
   Container,
@@ -14,10 +22,11 @@ import {
 import CardComponent from "../components/CardComponent";
 import HeaderComponent from "../components/HeaderComponent";
 import * as Animatable from "react-native-animatable";
-import { getData } from "../config/firebaseFunctions";
+import { getData, getNextData } from "../config/firebaseFunctions";
 const data = require("../data.json");
 export default function MainPage({ navigation }) {
   const [data, setData] = useState([]);
+  const [next, setNext] = useState(0);
 
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
@@ -26,47 +35,68 @@ export default function MainPage({ navigation }) {
     readyData();
   }, []);
   const readyData = async () => {
-    const data = await getData();
+    const data = await getData(setNext);
     setData(data);
   };
-
-  console.log(data);
+  console.log("다음:" + next);
   return (
     <Container>
       <HeaderComponent />
-      <Content>
-        <Animatable.View
-          animation="pulse"
-          easing="ease-out"
-          iterationCount={3}
-          direction="alternate"
-        >
-          <Grid style={styles.banner}>
-            <Col size={1} style={{ padding: 20 }}>
-              <Icon name="paper-plane" style={{ color: "deeppink" }} />
-            </Col>
-            <Col size={6} style={{ padding: 15 }}>
-              <Text>이야기 하고 싶은 친구들에게</Text>
-              <Text style={{ fontWeight: "700" }}>wegram을 전하세요</Text>
-            </Col>
-          </Grid>
-        </Animatable.View>
-
-        <Grid style={{ padding: 20 }}>
-          <Text style={{ color: "grey" }}>FROM THE DIARY</Text>
-        </Grid>
-        <View style={{ marginTop: -20 }}>
-          {data.map((content, i) => {
+      {data.length == 0 ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <FlatList
+          data={data}
+          ListHeaderComponent={() => {
             return (
-              <CardComponent
-                content={content}
-                key={i}
-                navigation={navigation}
-              />
+              <Content style={{ marginTop: 30 }}>
+                <Animatable.View
+                  animation="pulse"
+                  easing="ease-out"
+                  iterationCount={3}
+                  direction="alternate"
+                >
+                  <Grid style={styles.banner}>
+                    <Col size={1} style={{ padding: 20 }}>
+                      <Icon name="paper-plane" style={{ color: "deeppink" }} />
+                    </Col>
+                    <Col size={6} style={{ padding: 15 }}>
+                      <Text>이야기 하고 싶은 친구들에게</Text>
+                      <Text style={{ fontWeight: "700" }}>
+                        wegram을 전하세요
+                      </Text>
+                    </Col>
+                  </Grid>
+                </Animatable.View>
+
+                <Grid style={{ padding: 20 }}>
+                  <Text style={{ color: "grey" }}>FROM THE DIARY</Text>
+                </Grid>
+              </Content>
             );
-          })}
-        </View>
-      </Content>
+          }}
+          onEndReachedThreshold={0}
+          onEndReached={async () => {
+            console.log("바닥 가까이 감: 리프레시");
+            let nextData = await getNextData(next, setNext);
+            if (nextData == 0) {
+              Alert.alert("더이상 글이 없어요!");
+            } else {
+              let newData = [...data, ...nextData];
+              console.log(newData);
+              await setData(newData);
+            }
+          }}
+          renderItem={(data) => {
+            // console.log(data);
+            return (
+              <CardComponent navigation={navigation} content={data.item} />
+            );
+          }}
+          numColumns={1}
+          keyExtractor={(item) => item.date.toString()}
+        />
+      )}
     </Container>
   );
 }

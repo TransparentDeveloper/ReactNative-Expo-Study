@@ -26,11 +26,9 @@ export default function CardComponent({ navigation, content }) {
           <Grid>
             <Col size={9}>
               <Text numberOfLines={1} style={styles.title}>
-                제목이 쓰여요
+                {content.title}
               </Text>
-              <Text style={[styles.grey, styles.writer]}>
-                스파르타코딩 클럽
-              </Text>
+              <Text style={[styles.grey, styles.writer]}>{content.author}</Text>
             </Col>
             <Col size={2}>
               <Grid>
