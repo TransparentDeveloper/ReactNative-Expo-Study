@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import "firebase/compat/auth";
 import "firebase/compat/storage";
+
 import { Alert, AsyncStorage } from "react-native";
 
 export async function registration(nickName, email, password, navigation) {
@@ -46,8 +47,14 @@ export async function logout(navigation) {
 
 export async function addDiary(content) {
   try {
-    console.log("왔니?", content);
     const db = firebase.firestore();
+    let userRef = await db.collection("users").doc(content.uid);
+
+    let data = await userRef.get().then((doc) => {
+      return doc.data();
+    });
+    console.log(data.nickName);
+    content.author = data.nickName;
     await db
       .collection("diary")
       .doc(content.date + "D")
@@ -60,16 +67,28 @@ export async function addDiary(content) {
 }
 
 export async function imageUpload(blob, date) {
-  console.log("설마 여기까지 오다니?", date);
   const storageRef = firebase
     .storage()
     .ref()
     .child("diary/" + date);
   const snapshot = await storageRef.put(blob);
-  console.log("이건?");
   const imageUrl = await snapshot.ref.getDownloadURL();
-  console.log("끝");
   blob.close();
 
   return imageUrl;
+}
+
+export async function getData() {
+  try {
+    const db = firebase.firestore();
+    const snapshot = await db.collection("diary").get();
+    let data = [];
+    snapshot.docs.map((doc) => {
+      data.push(doc.data());
+    });
+    return data;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }

@@ -94,7 +94,7 @@ export default function AddPage() {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       aspect: [4, 4],
-      quality: 1,
+      quality: 0,
     });
 
     getImageUrl(imageData);
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   progress: {
     width: 100,
     height: 100,
-    borderRadius: 100,
+    borderRadius: 10000,
     position: "absolute",
     top: "50%",
     alignSelf: "center",
