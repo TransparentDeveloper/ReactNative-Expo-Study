@@ -78,17 +78,96 @@ export async function imageUpload(blob, date) {
   return imageUrl;
 }
 
-export async function getData() {
+export async function getData(setNext) {
   try {
-    const db = firebase.firestore();
-    const snapshot = await db.collection("diary").get();
     let data = [];
+    const db = firebase.firestore();
+    const first = db.collection("diary").orderBy("date", "desc").limit(5);
+
+    const snapshot = await first.get();
     snapshot.docs.map((doc) => {
+      console.log("[페이지네이션 01]");
       data.push(doc.data());
     });
+    let last;
+    if (snapshot.docs.length !== 0) {
+      last = snapshot.docs[snapshot.docs.length - 1];
+    }
+    setNext(last.data().date);
+    console.log(last.data().date);
+
     return data;
   } catch (err) {
     console.log(err);
     return false;
+  }
+}
+
+export async function getNextData(nextDate, setNext) {
+  try {
+    console.log("불러올 다음 date: " + nextDate);
+    let data = [];
+    const db = firebase.firestore();
+    const next = db
+      .collection("diary")
+      .orderBy("date", "desc")
+      .startAfter(nextDate)
+      .limit(5);
+    const snapshot = await next.get();
+    snapshot.docs.map((doc) => {
+      console.log("[페이지네이션 Next]");
+      doc.data();
+      data.push(doc.data());
+    });
+
+    let last;
+    if (snapshot.docs.length !== 0) {
+      last = snapshot.docs[snapshot.docs.length - 1];
+      setNext(last.data().date);
+      return data;
+    } else {
+      return 0;
+    }
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function addComment(comment) {
+  try {
+    const db = firebase.firestore();
+    let userRef = await db.collection("users").doc(comment.uid);
+
+    let data = await userRef.get().then((doc) => {
+      return doc.data();
+    });
+    console.log(data.nickName);
+    comment.author = data.nickName;
+    await db
+      .collection("comment")
+      .doc(comment.date + "D")
+      .set(comment);
+    return true;
+  } catch (err) {
+    Alert.alert("댓글 작성에 문제가 있습니다! ", err.message);
+    return false;
+  }
+}
+
+export async function getComment(did) {
+  const db = firebase.firestore();
+  let data = [];
+  let snapshot = await db.collection("comment").where("did", "==", did).get();
+  if (snapshot.empty) {
+    console.log("No matching documents.");
+    return 0;
+  } else {
+    snapshot.forEach((doc) => {
+      console.log(doc.id, "=>", doc.data());
+      data.push(doc.data());
+    });
+
+    return data;
   }
 }
