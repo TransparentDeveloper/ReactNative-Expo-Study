@@ -119,7 +119,7 @@ export async function getNextData(nextDate, setNext) {
       doc.data();
       data.push(doc.data());
     });
-    console.log(snapshot.docs.length);
+
     let last;
     if (snapshot.docs.length !== 0) {
       last = snapshot.docs[snapshot.docs.length - 1];
@@ -131,5 +131,43 @@ export async function getNextData(nextDate, setNext) {
   } catch (err) {
     console.log(err);
     return false;
+  }
+}
+
+export async function addComment(comment) {
+  try {
+    const db = firebase.firestore();
+    let userRef = await db.collection("users").doc(comment.uid);
+
+    let data = await userRef.get().then((doc) => {
+      return doc.data();
+    });
+    console.log(data.nickName);
+    comment.author = data.nickName;
+    await db
+      .collection("comment")
+      .doc(comment.date + "D")
+      .set(comment);
+    return true;
+  } catch (err) {
+    Alert.alert("댓글 작성에 문제가 있습니다! ", err.message);
+    return false;
+  }
+}
+
+export async function getComment(did) {
+  const db = firebase.firestore();
+  let data = [];
+  let snapshot = await db.collection("comment").where("did", "==", did).get();
+  if (snapshot.empty) {
+    console.log("No matching documents.");
+    return 0;
+  } else {
+    snapshot.forEach((doc) => {
+      console.log(doc.id, "=>", doc.data());
+      data.push(doc.data());
+    });
+
+    return data;
   }
 }
