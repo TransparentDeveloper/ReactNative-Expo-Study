@@ -1,11 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Image, TouchableOpacity } from "react-native";
 import { Col, Row, Grid } from "react-native-easy-grid";
 import { Icon, Text, Card, CardItem } from "native-base";
 const image = require("../assets/background2.png");
 const logo = require("../assets/logo.png");
 import ImageBlurLoading from "react-native-image-blur-loading";
+
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import "firebase/compat/auth";
+
+import { doLike } from "../config/firebaseFunctions";
 export default function CardComponent({ navigation, content }) {
+  const [like, setLike] = useState(false);
+  useEffect(() => {
+    if (content.like == true) {
+      setLike(true);
+    } else {
+      setLike(false);
+    }
+  }, []);
+
+  const likeFunc = () => {
+    const currentUser = firebase.auth().currentUser;
+    const uid = currentUser.uid;
+    const did = content.date + "D";
+    let result = doLike(uid, did, like);
+    if (result) {
+      console.log("좋아요!");
+      if (like == true) {
+        //좋아요 -> 해제
+        setLike(false);
+      } else {
+        //해제 -> 좋아요
+        setLike(true);
+      }
+    }
+  };
   return (
     <TouchableOpacity
       onPress={() => {
@@ -36,7 +67,13 @@ export default function CardComponent({ navigation, content }) {
                   <Icon name="chatbox-outline" style={styles.grey} />
                 </Col>
                 <Col>
-                  <Icon name="heart-outline" style={styles.grey} />
+                  <Icon
+                    name={like == true ? "heart" : "heart-outline"}
+                    style={like == true ? styles.pink : styles.grey}
+                    onPress={() => {
+                      likeFunc();
+                    }}
+                  />
                 </Col>
               </Grid>
             </Col>
@@ -55,6 +92,7 @@ const styles = StyleSheet.create({
   },
   image: { height: 200, width: "100%", borderRadius: 10 },
   grey: { color: "grey" },
+  pink: { color: "deeppink" },
   writer: { fontSize: 12, color: "grey", marginLeft: 10 },
   title: { fontWeight: "700", fontSize: 15, marginLeft: 10 },
 });

@@ -78,25 +78,51 @@ export async function imageUpload(blob, date) {
   return imageUrl;
 }
 
-export async function getData(setNext) {
+export async function getData(setNext, setData) {
   try {
     let data = [];
     const db = firebase.firestore();
     const first = db.collection("diary").orderBy("date", "desc").limit(5);
 
     const snapshot = await first.get();
-    snapshot.docs.map((doc) => {
-      console.log("[페이지네이션 01]");
-      data.push(doc.data());
-    });
+    const currentUser = firebase.auth().currentUser;
+    // snapshot.docs.map((doc) => {
+    //   console.log("[페이지네이션 01]")
+    //   data.push(doc.data());
+    // });
     let last;
     if (snapshot.docs.length !== 0) {
       last = snapshot.docs[snapshot.docs.length - 1];
     }
     setNext(last.data().date);
-    console.log(last.data().date);
+    let count = 0;
+    let limit = snapshot.docs.length;
 
-    return data;
+    snapshot.docs.map(async (doc) => {
+      console.log("[페이지네이션 01]");
+      let d = doc.data();
+      const like = await db
+        .collection("diary")
+        .doc(d.date + "D")
+        .collection("likes")
+        .doc(currentUser.uid)
+        .get();
+
+      if (like.data() == undefined) {
+        d.like = false;
+      } else {
+        d.like = true;
+      }
+
+      //count 갯수가 불러온 게시글 갯수만큼 늘어났다면
+      //게시글 상태를 관리할 타이밍!
+      count += 1;
+      data.push(d);
+      if (count == limit) {
+        setData(data);
+      }
+    });
+    // return data
   } catch (err) {
     console.log(err);
     return false;
@@ -169,5 +195,34 @@ export async function getComment(did) {
     });
 
     return data;
+  }
+}
+
+export async function doLike(uid, did, like) {
+  console.log(uid, did);
+  try {
+    const db = firebase.firestore();
+    const date = new Date();
+    const getTime = date.getTime();
+    console.log(did);
+    //좋아요 -> 해제
+    if (like == true) {
+      await db
+        .collection("diary")
+        .doc(did)
+        .collection("likes")
+        .doc(uid)
+        .delete();
+    } else {
+      //해제 -> 좋아요
+      await db.collection("diary").doc(did).collection("likes").doc(uid).set({
+        date: getTime,
+      });
+    }
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
